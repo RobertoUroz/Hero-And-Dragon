@@ -16,7 +16,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
             get => m_Prefab_Dog;
             set => m_Prefab_Dog = value;
         }
-        private Animator dogAnimator;
+        public Animator dogAnimator;
+        private Animator anchor_dogAnimator;
 
         [SerializeField]
         GameObject m_Prefab_Cat;
@@ -26,10 +27,25 @@ namespace UnityEngine.XR.ARFoundation.Samples
             get => m_Prefab_Cat;
             set => m_Prefab_Cat = value;
         }
-        private Animator catAnimator;
+        public Animator catAnimator;
 
-        private bool isCat = true;
+        private string petSelected = "";
         private bool first = true;
+
+        private bool catSpawned = false;
+        private bool dogSpawned = false;
+
+        public void SelectPet(string selectionPet)
+        {
+            if (petSelected.Equals(selectionPet))
+            {
+                petSelected = "";
+            }
+            else
+            {
+                petSelected = selectionPet;
+            }
+        }
 
         public void RemoveAllAnchors()
         {
@@ -39,31 +55,29 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 Destroy(anchor.gameObject);
             }
             m_Anchors.Clear();
-            first = true;
-            isCat = true;
+            catSpawned = false;
+            dogSpawned = false;
         }
 
         void Awake()
         {
             m_RaycastManager = GetComponent<ARRaycastManager>();
             m_AnchorManager = GetComponent<ARAnchorManager>();
-            dogAnimator = prefabDog.GetComponent<Animator>();
         }
 
         ARAnchor CreateAnchor(in ARRaycastHit hit)
         {
             ARAnchor anchor = null;
             GameObject prefab;
-            if (isCat)
+            if (petSelected.Equals("Cat"))
             {
                 prefab = prefabCat;
-                isCat = false;
+                catSpawned = true;
             }
             else
             {
                 prefab = prefabDog;
-                isCat = true;
-                first = false;
+                dogSpawned = true;
             }
 
             // If we hit a plane, try to "attach" the anchor to the plane
@@ -86,6 +100,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
             // Note: the anchor can be anywhere in the scene hierarchy
             var gameObject = Instantiate(prefab, hit.pose.position, hit.pose.rotation);
+            if (petSelected.Equals("Dog"))
+                anchor_dogAnimator = gameObject.GetComponent<Animator>();
 
             // Make sure the new GameObject has an ARAnchor component
             anchor = gameObject.GetComponent<ARAnchor>();
@@ -107,22 +123,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 return;
             
             //interaction with the pets when clicking
-            dogAnimator.SetBool("ClickDog", false);
-            if (!first)
-            {
-                if (isCat)
-                {
-                    isCat = false;
-                    return;
-                }
-                else
-                {
-                    Logger.Log("setting condition to true.");
-                    dogAnimator.SetBool("ClickDog", true);
-                    isCat = true;
-                    return;
-                }
-            }
+            if (interactWithPets())
+                return;
 
             // Raycast against planes and feature points
             const TrackableType trackableTypes =
@@ -135,18 +137,42 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 // Raycast hits are sorted by distance, so the first one will be the closest hit.
                 var hit = s_Hits[0];
 
-                // Create a new anchor
-                var anchor = CreateAnchor(hit);
-                if (anchor)
+                // Create a new anchor only if there is a pet selected
+                if ((petSelected.Equals("Cat") && !catSpawned) || (petSelected.Equals("Dog") && !dogSpawned))
                 {
-                    // Remember the anchor so we can remove it later.
-                    m_Anchors.Add(anchor);
-                }
-                else
-                {
-                    Logger.Log("Error creating anchor");
+                    var anchor = CreateAnchor(hit);
+                    if (anchor)
+                    {
+                        // Remember the anchor so we can remove it later.
+                        m_Anchors.Add(anchor);
+                    }
+                    else
+                    {
+                        Logger.Log("Error creating anchor");
+                    }   
                 }
             }
+        }
+
+        private bool interactWithPets()
+        {
+            if (catSpawned && petSelected.Equals("Cat"))
+            {
+                return true;
+            }
+            else if (dogSpawned && petSelected.Equals("Dog"))
+            {
+                Logger.Log("setting condition to true.");
+                Logger.Log(dogAnimator.ToString());
+
+                dogAnimator.SetBool("ClickDog", true);
+                anchor_dogAnimator.SetBool("ClickDog", true);
+
+                dogAnimator.SetBool("ClickDog", false);
+                anchor_dogAnimator.SetBool("ClickDog", false);
+                return true;
+            }
+            return false;
         }
 
         static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
