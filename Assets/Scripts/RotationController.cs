@@ -4,14 +4,14 @@ using UnityEngine.UI;
 namespace UnityEngine.XR.ARFoundation.Samples
 {
     /// <summary>
-    /// Controls the orientation of content place by the <see cref="MakeAppearOnPlane"/>
+    /// Controls the orientation of content place by the <see cref="RotationCharacter"/>
     /// component using a UI.Slider to affect the rotation about the Y axis.
     /// </summary>
-    [RequireComponent(typeof(MakeAppearOnPlane))]
+    [RequireComponent(typeof(RotationCharacter))]
     public class RotationController : MonoBehaviour
     {
-        MakeAppearOnPlane m_MakeAppearOnPlane;
-
+        RotationCharacter m_RotationCharacter;
+        
         [SerializeField]
         [Tooltip("The slider used to control rotation.")]
         Slider m_Slider;
@@ -71,24 +71,25 @@ namespace UnityEngine.XR.ARFoundation.Samples
         {
             if (slider != null)
                 angle = slider.value * (max - min) + min;
+            Logger.Log("Hello");
         }
 
         float angle
         {
             get
             {
-                return m_MakeAppearOnPlane.rotation.eulerAngles.y;
+                return m_RotationCharacter.getCharacterRotation().eulerAngles.y;
             }
             set
             {
-                m_MakeAppearOnPlane.rotation = Quaternion.AngleAxis(value, Vector3.up);
+                m_RotationCharacter.setCharacterRotation(Quaternion.AngleAxis(value, Vector3.up));
                 UpdateText();
             }
         }
 
         void Awake()
         {
-            m_MakeAppearOnPlane = GetComponent<MakeAppearOnPlane>();
+            m_RotationCharacter = GetComponent<RotationCharacter>();
         }
 
         void OnEnable()

@@ -9,41 +9,38 @@ namespace UnityEngine.XR.ARFoundation.Samples
     public class AnchorCreator : MonoBehaviour
     {
         [SerializeField]
-        GameObject m_Prefab_Dog;
+        GameObject m_Prefab_Hero;
 
-        public GameObject prefabDog
+        public GameObject prefabHero
         {
-            get => m_Prefab_Dog;
-            set => m_Prefab_Dog = value;
+            get => m_Prefab_Hero;
+            set => m_Prefab_Hero = value;
         }
-        public Animator dogAnimator;
-        private Animator anchor_dogAnimator;
+        private Animator anchor_heroAnimator;
 
         [SerializeField]
-        GameObject m_Prefab_Cat;
+        GameObject m_Prefab_Dragon;
 
-        public GameObject prefabCat
+        public GameObject prefabDragon
         {
-            get => m_Prefab_Cat;
-            set => m_Prefab_Cat = value;
+            get => m_Prefab_Dragon;
+            set => m_Prefab_Dragon = value;
         }
-        public Animator catAnimator;
 
-        private string petSelected = "";
         private bool first = true;
 
-        private bool catSpawned = false;
-        private bool dogSpawned = false;
+        private bool dragonSpawned = false;
+        private bool heroSpawned = false;
 
-        public void SelectPet(string selectionPet)
+        public void SelectCharacter(string character)
         {
-            if (petSelected.Equals(selectionPet))
+            if (StaticClass.characterSelected.Equals(character))
             {
-                petSelected = "";
+                StaticClass.characterSelected = "";
             }
             else
             {
-                petSelected = selectionPet;
+                StaticClass.characterSelected = character;
             }
         }
 
@@ -55,8 +52,9 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 Destroy(anchor.gameObject);
             }
             m_Anchors.Clear();
-            catSpawned = false;
-            dogSpawned = false;
+            dragonSpawned = false;
+            heroSpawned = false;
+            StaticClass.characterSelected = "";
         }
 
         void Awake()
@@ -69,15 +67,15 @@ namespace UnityEngine.XR.ARFoundation.Samples
         {
             ARAnchor anchor = null;
             GameObject prefab;
-            if (petSelected.Equals("Cat"))
+            if (StaticClass.characterSelected.Equals("Dragon"))
             {
-                prefab = prefabCat;
-                catSpawned = true;
+                prefab = prefabDragon;
+                dragonSpawned = true;
             }
             else
             {
-                prefab = prefabDog;
-                dogSpawned = true;
+                prefab = prefabHero;
+                heroSpawned = true;
             }
 
             // If we hit a plane, try to "attach" the anchor to the plane
@@ -100,8 +98,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
             // Note: the anchor can be anywhere in the scene hierarchy
             var gameObject = Instantiate(prefab, hit.pose.position, hit.pose.rotation);
-            if (petSelected.Equals("Dog"))
-                anchor_dogAnimator = gameObject.GetComponent<Animator>();
+            if (StaticClass.characterSelected.Equals("Hero"))
+                anchor_heroAnimator = gameObject.GetComponent<Animator>();
 
             // Make sure the new GameObject has an ARAnchor component
             anchor = gameObject.GetComponent<ARAnchor>();
@@ -123,7 +121,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 return;
             
             //interaction with the pets when clicking
-            if (interactWithPets())
+            if (interactWithCharacters())
                 return;
 
             // Raycast against planes and feature points
@@ -138,7 +136,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 var hit = s_Hits[0];
 
                 // Create a new anchor only if there is a pet selected
-                if ((petSelected.Equals("Cat") && !catSpawned) || (petSelected.Equals("Dog") && !dogSpawned))
+                Logger.Log(StaticClass.characterSelected);
+                if ((StaticClass.characterSelected.Equals("Dragon") && !dragonSpawned) || (StaticClass.characterSelected.Equals("Hero") && !heroSpawned))
                 {
                     var anchor = CreateAnchor(hit);
                     if (anchor)
@@ -154,22 +153,20 @@ namespace UnityEngine.XR.ARFoundation.Samples
             }
         }
 
-        private bool interactWithPets()
+        private bool interactWithCharacters()
         {
-            if (catSpawned && petSelected.Equals("Cat"))
+            if (dragonSpawned && StaticClass.characterSelected.Equals("Dragon"))
             {
                 return true;
             }
-            else if (dogSpawned && petSelected.Equals("Dog"))
+            else if (heroSpawned && StaticClass.characterSelected.Equals("Hero"))
             {
                 Logger.Log("setting condition to true.");
-                Logger.Log(dogAnimator.ToString());
+                Logger.Log(anchor_heroAnimator.ToString());
 
-                dogAnimator.SetBool("ClickDog", true);
-                anchor_dogAnimator.SetBool("ClickDog", true);
+                anchor_heroAnimator.SetBool("ClickHero", true);
 
-                dogAnimator.SetBool("ClickDog", false);
-                anchor_dogAnimator.SetBool("ClickDog", false);
+                anchor_heroAnimator.SetBool("ClickHero", false);
                 return true;
             }
             return false;
