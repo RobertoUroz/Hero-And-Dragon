@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 namespace UnityEngine.XR.ARFoundation.Samples
 {
@@ -7,11 +8,13 @@ namespace UnityEngine.XR.ARFoundation.Samples
     /// Controls the orientation of content place by the <see cref="RotationCharacter"/>
     /// component using a UI.Slider to affect the rotation about the Y axis.
     /// </summary>
-    [RequireComponent(typeof(RotationCharacter))]
     public class RotationController : MonoBehaviour
     {
-        RotationCharacter m_RotationCharacter;
-        
+
+        public Transform heroPrefab;
+
+        public Transform dragonPrefab;
+
         [SerializeField]
         [Tooltip("The slider used to control rotation.")]
         Slider m_Slider;
@@ -69,27 +72,29 @@ namespace UnityEngine.XR.ARFoundation.Samples
         /// </summary>
         public void OnSliderValueChanged()
         {
+            Logger.Log("Hello1");
             if (slider != null)
                 angle = slider.value * (max - min) + min;
-            Logger.Log("Hello");
+            Logger.Log("Hello2");
         }
 
         float angle
         {
             get
             {
-                return m_RotationCharacter.getCharacterRotation().eulerAngles.y;
+                if (StaticClass.characterSelected == "Dragon") return dragonPrefab.localRotation.eulerAngles.y;
+                else return heroPrefab.localRotation.eulerAngles.y;
             }
             set
             {
-                m_RotationCharacter.setCharacterRotation(Quaternion.AngleAxis(value, Vector3.up));
+                if (StaticClass.characterSelected == "Dragon") dragonPrefab.localRotation = Quaternion.AngleAxis(value, Vector3.up);
+                else if (StaticClass.characterSelected == "Hero") heroPrefab.localRotation = Quaternion.AngleAxis(value, Vector3.up);
                 UpdateText();
             }
         }
 
         void Awake()
         {
-            m_RotationCharacter = GetComponent<RotationCharacter>();
         }
 
         void OnEnable()
@@ -102,7 +107,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
         void UpdateText()
         {
             if (m_Text != null)
-                m_Text.text = "Rotation: " + angle + " degrees";
+                m_Text.text = "Rotation: " + (int)angle + " degrees";
         }
     }
+
 }

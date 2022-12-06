@@ -10,6 +10,11 @@ namespace UnityEngine.XR.ARFoundation.Samples
     [RequireComponent(typeof(ARSessionOrigin))]
     public class ScaleController : MonoBehaviour
     {
+
+        public Transform heroPrefab;
+
+        public Transform dragonPrefab;
+
         [SerializeField]
         [Tooltip("The slider used to control the scale factor.")]
         Slider m_Slider;
@@ -75,18 +80,19 @@ namespace UnityEngine.XR.ARFoundation.Samples
         {
             get
             {
-                return m_SessionOrigin.transform.localScale.x;
+                if (StaticClass.characterSelected == "Dragon") return dragonPrefab.localScale.x;
+                else return heroPrefab.localScale.x;
             }
             set
             {
-                m_SessionOrigin.transform.localScale = Vector3.one * value;
+                if (StaticClass.characterSelected == "Dragon") dragonPrefab.transform.localScale = Vector3.one * value;
+                else if (StaticClass.characterSelected == "Hero") heroPrefab.transform.localScale = Vector3.one * value;
                 UpdateText();
             }
         }
 
         void Awake()
         {
-            m_SessionOrigin = GetComponent<ARSessionOrigin>();
         }
 
         void OnEnable()
@@ -99,9 +105,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
         void UpdateText()
         {
             if (text != null)
-                text.text = "Scale: " + scale;
+                text.text = "Scale: " + (int)scale;
         }
-
-        ARSessionOrigin m_SessionOrigin;
     }
 }

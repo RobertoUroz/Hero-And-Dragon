@@ -16,7 +16,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
             get => m_Prefab_Hero;
             set => m_Prefab_Hero = value;
         }
-        private Animator anchor_heroAnimator;
+        public Animator heroAnimator;
 
         [SerializeField]
         GameObject m_Prefab_Dragon;
@@ -26,6 +26,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
             get => m_Prefab_Dragon;
             set => m_Prefab_Dragon = value;
         }
+
+        public Animator dragonAnimator;
 
         private bool first = true;
 
@@ -46,14 +48,10 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public void RemoveAllAnchors()
         {
-            Logger.Log($"Removing all anchors ({m_Anchors.Count})");
-            foreach (var anchor in m_Anchors)
-            {
-                Destroy(anchor.gameObject);
-            }
-            m_Anchors.Clear();
             dragonSpawned = false;
             heroSpawned = false;
+            prefabDragon.transform.localScale = Vector3.zero;
+            prefabHero.transform.localScale = Vector3.zero;
             StaticClass.characterSelected = "";
         }
 
@@ -66,46 +64,30 @@ namespace UnityEngine.XR.ARFoundation.Samples
         ARAnchor CreateAnchor(in ARRaycastHit hit)
         {
             ARAnchor anchor = null;
-            GameObject prefab;
-            if (StaticClass.characterSelected.Equals("Dragon"))
-            {
-                prefab = prefabDragon;
-                dragonSpawned = true;
-            }
-            else
-            {
-                prefab = prefabHero;
-                heroSpawned = true;
-            }
-
-            // If we hit a plane, try to "attach" the anchor to the plane
             if (hit.trackable is ARPlane plane)
             {
+                // If we hit a plane, try to "attach" the anchor to the plane
                 var planeManager = GetComponent<ARPlaneManager>();
                 if (planeManager)
                 {
                     Logger.Log("Creating anchor attachment.");
-                    var oldPrefab = m_AnchorManager.anchorPrefab;
-                    m_AnchorManager.anchorPrefab = prefab;
                     anchor = m_AnchorManager.AttachAnchor(plane, hit.pose);
-                    m_AnchorManager.anchorPrefab = oldPrefab;
+                    if (StaticClass.characterSelected.Equals("Dragon"))
+                    {
+                        prefabDragon.transform.SetParent(anchor.transform);
+                        prefabDragon.transform.localScale = Vector3.one;
+                        prefabDragon.transform.localPosition = Vector3.zero;
+                        dragonSpawned = true;
+                    }
+                    else if (StaticClass.characterSelected.Equals("Hero"))
+                    {
+                        prefabHero.transform.SetParent(anchor.transform);
+                        prefabHero.transform.localScale = Vector3.one;
+                        prefabHero.transform.localPosition = Vector3.zero;
+                        heroSpawned = true;
+                    }
                     return anchor;
                 }
-            }
-
-            // Otherwise, just create a regular anchor at the hit pose
-            Logger.Log("Creating regular anchor.");
-
-            // Note: the anchor can be anywhere in the scene hierarchy
-            var gameObject = Instantiate(prefab, hit.pose.position, hit.pose.rotation);
-            if (StaticClass.characterSelected.Equals("Hero"))
-                anchor_heroAnimator = gameObject.GetComponent<Animator>();
-
-            // Make sure the new GameObject has an ARAnchor component
-            anchor = gameObject.GetComponent<ARAnchor>();
-            if (anchor == null)
-            {
-                anchor = gameObject.AddComponent<ARAnchor>();
             }
 
             return anchor;
@@ -140,15 +122,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 if ((StaticClass.characterSelected.Equals("Dragon") && !dragonSpawned) || (StaticClass.characterSelected.Equals("Hero") && !heroSpawned))
                 {
                     var anchor = CreateAnchor(hit);
-                    if (anchor)
-                    {
-                        // Remember the anchor so we can remove it later.
-                        m_Anchors.Add(anchor);
-                    }
-                    else
-                    {
-                        Logger.Log("Error creating anchor");
-                    }   
                 }
             }
         }
@@ -162,19 +135,17 @@ namespace UnityEngine.XR.ARFoundation.Samples
             else if (heroSpawned && StaticClass.characterSelected.Equals("Hero"))
             {
                 Logger.Log("setting condition to true.");
-                Logger.Log(anchor_heroAnimator.ToString());
+                Logger.Log(heroAnimator.ToString());
 
-                anchor_heroAnimator.SetBool("ClickHero", true);
+                heroAnimator.SetBool("ClickHero", true);
 
-                anchor_heroAnimator.SetBool("ClickHero", false);
+                heroAnimator.SetBool("ClickHero", false);
                 return true;
             }
             return false;
         }
 
         static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
-
-        List<ARAnchor> m_Anchors = new List<ARAnchor>();
 
         ARRaycastManager m_RaycastManager;
 
