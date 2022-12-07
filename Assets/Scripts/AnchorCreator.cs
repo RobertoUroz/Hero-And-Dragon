@@ -27,29 +27,36 @@ namespace UnityEngine.XR.ARFoundation.Samples
             set => m_Prefab_Dragon = value;
         }
 
-        public Animator dragonAnimator;
+        public GameObject scaleAndRotationSystem;
 
-        private bool first = true;
+        public GameObject heroAttackButton;
 
-        private bool dragonSpawned = false;
-        private bool heroSpawned = false;
+        public GameObject dragonAttackButton;
 
         public void SelectCharacter(string character)
         {
             if (StaticClass.characterSelected.Equals(character))
             {
                 StaticClass.characterSelected = "";
+                scaleAndRotationSystem.SetActive(false);
             }
             else
             {
                 StaticClass.characterSelected = character;
+                if ((character.Equals("Hero") && StaticClass.heroSpawned) || (character.Equals("Dragon") && StaticClass.dragonSpawned))
+                {
+                    scaleAndRotationSystem.SetActive(true);
+                }
             }
         }
 
         public void RemoveAllAnchors()
         {
-            dragonSpawned = false;
-            heroSpawned = false;
+            StaticClass.dragonSpawned = false;
+            StaticClass.heroSpawned = false;
+            scaleAndRotationSystem.SetActive(false);
+            heroAttackButton.SetActive(false);
+            dragonAttackButton.SetActive(false);
             prefabDragon.transform.localScale = Vector3.zero;
             prefabHero.transform.localScale = Vector3.zero;
             StaticClass.characterSelected = "";
@@ -77,14 +84,26 @@ namespace UnityEngine.XR.ARFoundation.Samples
                         prefabDragon.transform.SetParent(anchor.transform);
                         prefabDragon.transform.localScale = Vector3.one;
                         prefabDragon.transform.localPosition = Vector3.zero;
-                        dragonSpawned = true;
+                        StaticClass.dragonSpawned = true;
+                        scaleAndRotationSystem.SetActive(true);
+                        if (StaticClass.heroSpawned && StaticClass.dragonSpawned)
+                        {
+                            dragonAttackButton.SetActive(true);
+                            heroAttackButton.SetActive(true);
+                        }
                     }
                     else if (StaticClass.characterSelected.Equals("Hero"))
                     {
                         prefabHero.transform.SetParent(anchor.transform);
                         prefabHero.transform.localScale = Vector3.one;
                         prefabHero.transform.localPosition = Vector3.zero;
-                        heroSpawned = true;
+                        StaticClass.heroSpawned = true;
+                        scaleAndRotationSystem.SetActive(true);
+                        if (StaticClass.heroSpawned && StaticClass.dragonSpawned)
+                        {
+                            dragonAttackButton.SetActive(true);
+                            heroAttackButton.SetActive(true);
+                        }
                     }
                     return anchor;
                 }
@@ -119,7 +138,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
                 // Create a new anchor only if there is a pet selected
                 Logger.Log(StaticClass.characterSelected);
-                if ((StaticClass.characterSelected.Equals("Dragon") && !dragonSpawned) || (StaticClass.characterSelected.Equals("Hero") && !heroSpawned))
+                if ((StaticClass.characterSelected.Equals("Dragon") && !StaticClass.dragonSpawned) 
+                    || (StaticClass.characterSelected.Equals("Hero") && !StaticClass.heroSpawned))
                 {
                     var anchor = CreateAnchor(hit);
                 }
@@ -128,18 +148,12 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         private bool interactWithCharacters()
         {
-            if (dragonSpawned && StaticClass.characterSelected.Equals("Dragon"))
+            if (StaticClass.dragonSpawned && StaticClass.characterSelected.Equals("Dragon"))
             {
                 return true;
             }
-            else if (heroSpawned && StaticClass.characterSelected.Equals("Hero"))
+            else if (StaticClass.heroSpawned && StaticClass.characterSelected.Equals("Hero"))
             {
-                Logger.Log("setting condition to true.");
-                Logger.Log(heroAnimator.ToString());
-
-                heroAnimator.SetBool("ClickHero", true);
-
-                heroAnimator.SetBool("ClickHero", false);
                 return true;
             }
             return false;

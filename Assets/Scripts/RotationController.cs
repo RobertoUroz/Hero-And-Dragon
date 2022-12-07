@@ -72,10 +72,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
         /// </summary>
         public void OnSliderValueChanged()
         {
-            Logger.Log("Hello1");
             if (slider != null)
                 angle = slider.value * (max - min) + min;
-            Logger.Log("Hello2");
         }
 
         float angle
