@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.UI;
 
 namespace UnityEngine.XR.ARFoundation.Samples
 {
@@ -33,18 +34,36 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public GameObject dragonAttackButton;
 
+        public Slider scaleSlider;
+
+        public Slider rotationSlider;
+
+        public Text characterSelectedText;
+
         public void SelectCharacter(string character)
         {
             if (StaticClass.characterSelected.Equals(character))
             {
                 StaticClass.characterSelected = "";
+                characterSelectedText.text = "";
                 scaleAndRotationSystem.SetActive(false);
             }
             else
             {
                 StaticClass.characterSelected = character;
+                characterSelectedText.text = "Character Selected: " + character;
                 if ((character.Equals("Hero") && StaticClass.heroSpawned) || (character.Equals("Dragon") && StaticClass.dragonSpawned))
                 {
+                    if (character.Equals("Hero"))
+                    {
+                        rotationSlider.value = prefabHero.transform.localRotation.eulerAngles.y;
+                        scaleSlider.value = prefabHero.transform.localScale.x;
+                    }
+                    else if (character.Equals("Dragon"))
+                    {
+                        rotationSlider.value = prefabDragon.transform.localRotation.eulerAngles.y;
+                        scaleSlider.value = prefabDragon.transform.localScale.x;
+                    }
                     scaleAndRotationSystem.SetActive(true);
                 }
             }
@@ -55,11 +74,27 @@ namespace UnityEngine.XR.ARFoundation.Samples
             StaticClass.dragonSpawned = false;
             StaticClass.heroSpawned = false;
             scaleAndRotationSystem.SetActive(false);
+            characterSelectedText.text = "";
             heroAttackButton.SetActive(false);
             dragonAttackButton.SetActive(false);
             prefabDragon.transform.localScale = Vector3.zero;
             prefabHero.transform.localScale = Vector3.zero;
             StaticClass.characterSelected = "";
+        }
+
+        public void VictoryOfCharacter(string character)
+        {
+            scaleAndRotationSystem.SetActive(false);
+            characterSelectedText.text = "";
+            heroAttackButton.SetActive(false);
+            dragonAttackButton.SetActive(false);           
+            StaticClass.characterSelected = "";
+            if (character.Equals("Dragon")) {
+                StaticClass.heroSpawned = false;
+            } else if (character.Equals("Hero"))
+            {
+                StaticClass.dragonSpawned = false;
+            }
         }
 
         void Awake()

@@ -104,8 +104,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         void UpdateText()
         {
-            if (m_Text != null)
-                m_Text.text = "Rotation: " + (int)angle + " degrees";
+            //if (m_Text != null)
+            //    m_Text.text = "Rotation: " + (int)angle + " degrees";
         }
     }
 

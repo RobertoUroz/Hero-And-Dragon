@@ -104,8 +104,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         void UpdateText()
         {
-            if (text != null)
-                text.text = "Scale: " + (int)scale;
+            //if (text != null)
+            //    text.text = "Scale: " + (int)scale;
         }
     }
 }
