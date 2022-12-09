@@ -112,7 +112,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 var planeManager = GetComponent<ARPlaneManager>();
                 if (planeManager)
                 {
-                    Logger.Log("Creating anchor attachment.");
                     anchor = m_AnchorManager.AttachAnchor(plane, hit.pose);
                     if (StaticClass.characterSelected.Equals("Dragon"))
                     {
@@ -171,7 +170,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 var hit = s_Hits[0];
 
                 // Create a new anchor only if there is a pet selected
-                Logger.Log(StaticClass.characterSelected);
                 if ((StaticClass.characterSelected.Equals("Dragon") && !StaticClass.dragonSpawned) 
                     || (StaticClass.characterSelected.Equals("Hero") && !StaticClass.heroSpawned))
                 {

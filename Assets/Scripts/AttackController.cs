@@ -40,7 +40,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 this.WaitForAnimation(timeBetweenHits);
                 if (character == "Hero")
                 {    
-                    Logger.Log(character + ": " + counterHits);
                     counterHits = counterHits + 1;
                     if (counterHits <= totalHits)
                         dragonAnimator.SetTrigger("Hit");
@@ -57,7 +56,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 }
                 else if (character == "Dragon")
                 {
-                    Logger.Log(character + ": " + counterHits);
                     counterHits = counterHits + 1;
                     if (counterHits <= totalHits)
                     {
