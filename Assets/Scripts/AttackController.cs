@@ -42,7 +42,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 {    
                     Logger.Log(character + ": " + counterHits);
                     counterHits = counterHits + 1;
-                    dragonAnimator.SetTrigger("Hit");
+                    if (counterHits <= totalHits)
+                        dragonAnimator.SetTrigger("Hit");
                     heroAnimator.SetTrigger("Attack");
                     if (counterHits > totalHits)
                     {
@@ -58,8 +59,11 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 {
                     Logger.Log(character + ": " + counterHits);
                     counterHits = counterHits + 1;
-                    heroAnimator.SetTrigger("Hit");
-                    dragonAnimator.SetTrigger("Attack");
+                    if (counterHits <= totalHits)
+                    {
+                        dragonAnimator.SetTrigger("Attack");
+                        heroAnimator.SetTrigger("Hit");
+                    }
                     if (counterHits > totalHits)
                     {
                         heroAnimator.SetTrigger("Die");

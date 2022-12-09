@@ -7,13 +7,10 @@ namespace UnityEngine.XR.ARFoundation.Samples
     /// <summary>
     /// Sets the scale of the ARSessionOrigin according to the value of a UI.Slider.
     /// </summary>
-    [RequireComponent(typeof(ARSessionOrigin))]
     public class ScaleController : MonoBehaviour
     {
 
-        public Transform heroPrefab;
-
-        public Transform dragonPrefab;
+        public Transform prefab;
 
         [SerializeField]
         [Tooltip("The slider used to control the scale factor.")]
@@ -80,13 +77,11 @@ namespace UnityEngine.XR.ARFoundation.Samples
         {
             get
             {
-                if (StaticClass.characterSelected == "Dragon") return dragonPrefab.localScale.x;
-                else return heroPrefab.localScale.x;
+                return prefab.localScale.x;
             }
             set
             {
-                if (StaticClass.characterSelected == "Dragon") dragonPrefab.transform.localScale = Vector3.one * value;
-                else if (StaticClass.characterSelected == "Hero") heroPrefab.transform.localScale = Vector3.one * value;
+                prefab.transform.localScale = Vector3.one * value;
                 UpdateText();
             }
         }

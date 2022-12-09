@@ -11,9 +11,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
     public class RotationController : MonoBehaviour
     {
 
-        public Transform heroPrefab;
-
-        public Transform dragonPrefab;
+        public Transform prefab;
 
         [SerializeField]
         [Tooltip("The slider used to control rotation.")]
@@ -74,19 +72,18 @@ namespace UnityEngine.XR.ARFoundation.Samples
         {
             if (slider != null)
                 angle = slider.value * (max - min) + min;
+            Debug.Log(angle.ToString());
         }
 
         float angle
         {
             get
             {
-                if (StaticClass.characterSelected == "Dragon") return dragonPrefab.localRotation.eulerAngles.y;
-                else return heroPrefab.localRotation.eulerAngles.y;
+                return prefab.localRotation.eulerAngles.y;
             }
             set
             {
-                if (StaticClass.characterSelected == "Dragon") dragonPrefab.localRotation = Quaternion.AngleAxis(value, Vector3.up);
-                else if (StaticClass.characterSelected == "Hero") heroPrefab.localRotation = Quaternion.AngleAxis(value, Vector3.up);
+                prefab.localRotation = Quaternion.AngleAxis(value, Vector3.up);
                 UpdateText();
             }
         }

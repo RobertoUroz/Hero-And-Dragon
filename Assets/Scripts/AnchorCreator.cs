@@ -34,9 +34,9 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public GameObject dragonAttackButton;
 
-        public Slider scaleSlider;
+        public GameObject dragonSystem;
 
-        public Slider rotationSlider;
+        public GameObject heroSystem;
 
         public Text characterSelectedText;
 
@@ -56,13 +56,13 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 {
                     if (character.Equals("Hero"))
                     {
-                        rotationSlider.value = prefabHero.transform.localRotation.eulerAngles.y;
-                        scaleSlider.value = prefabHero.transform.localScale.x;
+                        heroSystem.SetActive(true);
+                        dragonSystem.SetActive(false);
                     }
                     else if (character.Equals("Dragon"))
                     {
-                        rotationSlider.value = prefabDragon.transform.localRotation.eulerAngles.y;
-                        scaleSlider.value = prefabDragon.transform.localScale.x;
+                        heroSystem.SetActive(false);
+                        dragonSystem.SetActive(true);
                     }
                     scaleAndRotationSystem.SetActive(true);
                 }
@@ -121,11 +121,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
                         prefabDragon.transform.localPosition = Vector3.zero;
                         StaticClass.dragonSpawned = true;
                         scaleAndRotationSystem.SetActive(true);
-                        if (StaticClass.heroSpawned && StaticClass.dragonSpawned)
-                        {
-                            dragonAttackButton.SetActive(true);
-                            heroAttackButton.SetActive(true);
-                        }
+                        heroSystem.SetActive(false);
+                        dragonSystem.SetActive(true);
                     }
                     else if (StaticClass.characterSelected.Equals("Hero"))
                     {
@@ -134,11 +131,13 @@ namespace UnityEngine.XR.ARFoundation.Samples
                         prefabHero.transform.localPosition = Vector3.zero;
                         StaticClass.heroSpawned = true;
                         scaleAndRotationSystem.SetActive(true);
-                        if (StaticClass.heroSpawned && StaticClass.dragonSpawned)
-                        {
-                            dragonAttackButton.SetActive(true);
-                            heroAttackButton.SetActive(true);
-                        }
+                        heroSystem.SetActive(true);
+                        dragonSystem.SetActive(false);
+                    }
+                    if (StaticClass.heroSpawned && StaticClass.dragonSpawned)
+                    {
+                        dragonAttackButton.SetActive(true);
+                        heroAttackButton.SetActive(true);
                     }
                     return anchor;
                 }
