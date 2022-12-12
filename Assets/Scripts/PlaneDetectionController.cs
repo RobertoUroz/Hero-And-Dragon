@@ -12,56 +12,32 @@ namespace UnityEngine.XR.ARFoundation.Samples
     [RequireComponent(typeof(ARPlaneManager))]
     public class PlaneDetectionController : MonoBehaviour
     {
-        [Tooltip("The UI Text element used to display plane detection messages.")]
-        [SerializeField]
-        Text m_TogglePlaneDetectionText;
+        
+        private bool planeVisualizationEnabled;
+
+        public GameObject planePrefab;
 
         /// <summary>
-        /// The UI Text element used to display plane detection messages.
+        /// Toggles plane visualization of the planes.
         /// </summary>
-        public Text togglePlaneDetectionText
+        public void TogglePlaneVisualization()
         {
-            get { return m_TogglePlaneDetectionText; }
-            set { m_TogglePlaneDetectionText = value; }
+            planeVisualizationEnabled = !planeVisualizationEnabled;
+            SetAllPlanesActive();
         }
 
-        /// <summary>
-        /// Toggles plane detection and the visualization of the planes.
-        /// </summary>
-        public void TogglePlaneDetection()
-        {
-            m_ARPlaneManager.enabled = !m_ARPlaneManager.enabled;
-
-            string planeDetectionMessage = "";
-            if (m_ARPlaneManager.enabled)
-            {
-                planeDetectionMessage = "Disable Plane Detection and Hide Existing";
-                SetAllPlanesActive(true);
-            }
-            else
-            {
-                planeDetectionMessage = "Enable Plane Detection and Show Existing";
-                SetAllPlanesActive(false);
-            }
-
-            if (togglePlaneDetectionText != null)
-                togglePlaneDetectionText.text = planeDetectionMessage;
-        }
-
-        /// <summary>
-        /// Iterates over all the existing planes and activates
-        /// or deactivates their <c>GameObject</c>s'.
-        /// </summary>
-        /// <param name="value">Each planes' GameObject is SetActive with this value.</param>
-        void SetAllPlanesActive(bool value)
+        private void SetAllPlanesActive()
         {
             foreach (var plane in m_ARPlaneManager.trackables)
-                plane.gameObject.SetActive(value);
+                plane.gameObject.SetActive(planeVisualizationEnabled);
         }
+
 
         void Awake()
         {
+            planeVisualizationEnabled = true;
             m_ARPlaneManager = GetComponent<ARPlaneManager>();
+            TogglePlaneVisualization();
         }
 
         ARPlaneManager m_ARPlaneManager;

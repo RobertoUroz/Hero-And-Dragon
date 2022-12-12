@@ -32,6 +32,12 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public GameObject sessionAR;
 
+        public AudioSource audioSourceHeroAttack;
+        public AudioSource audioSourceDragonAttack;
+        public AudioSource audioSourceHeroHit;
+        public AudioSource audioSourceHeroWin;
+        public AudioSource audioSourceDragonWin;
+
         public void attack()
         {
             if (timePassed >= timeBetweenHits)
@@ -42,13 +48,17 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 {    
                     counterHits = counterHits + 1;
                     if (counterHits <= totalHits)
+                    {
                         dragonAnimator.SetTrigger("Hit");
+                        audioSourceHeroAttack.Play();
+                    }
                     heroAnimator.SetTrigger("Attack");
                     if (counterHits > totalHits)
                     {
                         dragonAnimator.SetTrigger("Die");
                         dragonPrefab.SendMessage("Dissapear");
                         heroAnimator.SetTrigger("Victory");
+                        audioSourceHeroWin.Play();
                         counterHits = 1;
                         otherAttackButton.SendMessage("SetCounterHits", 1);
                         sessionAR.SendMessage("VictoryOfCharacter", "Hero");
@@ -61,9 +71,13 @@ namespace UnityEngine.XR.ARFoundation.Samples
                     {
                         dragonAnimator.SetTrigger("Attack");
                         heroAnimator.SetTrigger("Hit");
+                        audioSourceDragonAttack.Play();
+                        audioSourceHeroHit.Play();
                     }
                     if (counterHits > totalHits)
                     {
+                        audioSourceDragonWin.Play();
+                        audioSourceHeroHit.Play();
                         heroAnimator.SetTrigger("Die");
                         heroPrefab.SendMessage("Dissapear");
                         dragonAnimator.SetTrigger("Victory");
@@ -73,6 +87,10 @@ namespace UnityEngine.XR.ARFoundation.Samples
                     }
                 }
             }
+        }
+
+        public void Start()
+        {
         }
 
         public void Update()
